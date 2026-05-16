@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ author.full_name }} — ZimLatestNews{% endblock %}
+{% block meta_description %}Read all articles by {{ author.full_name }}, {{ author.title }} at ZimLatestNews.{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+  <nav class="breadcrumbs">
+    <a href="{% url 'articles:home' %}">Home</a><span>›</span>
+    <span>{{ author.full_name }}</span>
+  </nav>
+
+  <div class="author-profile">
+    {% if author.photo %}
+      <img src="{{ author.photo.url }}" alt="{{ author.full_name }}" class="author-avatar">
+    {% else %}
+      <div class="author-avatar" style="background:var(--surface);display:flex;align-items:center;justify-content:center;">
+        <i class="ti ti-user" style="font-size:36px;color:var(--muted);"></i>
+      </div>
+    {% endif %}
+    <div style="flex:1;">
+      <h1 class="author-info-name">{{ author.full_name }}</h1>
+      {% if author.title %}<p class="author-info-title">{{ author.title }}</p>{% endif %}
+      {% if author.bio %}<p class="author-info-bio">{{ author.bio }}</p>{% endif %}
+      <div class="author-socials">
+        {% if author.twitter  %}<a href="{{ author.twitter }}"  class="social-link" target="_blank"><i class="ti ti-brand-x"></i> Twitter</a>{% endif %}
+        {% if author.facebook %}<a href="{{ author.facebook }}" class="social-link" target="_blank"><i class="ti ti-brand-facebook"></i> Facebook</a>{% endif %}
+        {% if author.linkedin %}<a href="{{ author.linkedin }}" class="social-link" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a>{% endif %}
+        {% if author.website  %}<a href="{{ author.website  }}" class="social-link" target="_blank"><i class="ti ti-world"></i> Website</a>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">{{ total }} Article{{ total|pluralize }} by {{ author.full_name }}</div>
+
+  <div class="cards-row">
+    {% for article in page_obj %}
+      {% include "article_card.html" with article=article %}
+    {% endfor %}
+  </div>
+
+  {% include "pagination.html" with page_obj=page_obj %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,274 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,700;1,400&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', var(--font-sans);
+    --navy: #0e1f3d; --navy-mid: #1a3260; --gold: #c9a84c;
+    --gold-light: #f7f0df; --gold-bright: #e6b84a;
+    --ink: #0e1f3d; --body: #2c3a52; --muted: #6b7a94;
+    --subtle: #a0adc0; --rule: #e4e8f0; --surface: #f5f7fb;
+  }
+  .site { font-family: var(--sans); color: var(--ink); background: #fff; max-width: 900px; margin: 0 auto; }
+
+  .topstrip { background: var(--navy); color: rgba(255,255,255,0.6); padding: 6px 1.5rem; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+  .topstrip-left { display: flex; gap: 14px; align-items: center; }
+  .live-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--gold-bright); }
+  .live-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-bright); display: inline-block; animation: pulse 1.5s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .topstrip-right { display: flex; gap: 14px; }
+  .topstrip-right a { color: rgba(255,255,255,0.55); text-decoration: none; font-size: 11px; }
+  .topstrip-right a:hover { color: var(--gold-bright); }
+
+  .header { padding: 1.25rem 1.5rem 0; border-bottom: 1px solid var(--rule); }
+  .header-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.25rem; }
+  .logo { font-family: var(--serif); font-size: 30px; font-weight: 700; letter-spacing: -1px; color: var(--navy); line-height: 1; }
+  .logo span { color: var(--gold); }
+  .logo-sub { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .header-cta { font-size: 12px; font-weight: 600; padding: 8px 20px; background: var(--navy); color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  .header-cta:hover { background: var(--navy-mid); }
+
+  nav { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+  nav a { font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; padding: 10px 14px; white-space: nowrap; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
+  nav a:hover { color: var(--navy); }
+  nav a.active { color: var(--navy); border-bottom-color: var(--gold); font-weight: 600; }
+
+  .breaking { background: var(--navy); color: rgba(255,255,255,0.85); padding: 8px 1.5rem; font-size: 12px; display: flex; align-items: center; gap: 10px; overflow: hidden; }
+  .breaking-pill { background: var(--gold); color: var(--navy); padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+
+  .content { padding: 1.5rem; }
+
+  .hero { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; margin-bottom: 2rem; }
+  .hero-main { cursor: pointer; }
+  .hero-img { width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; background: var(--surface); position: relative; }
+  .hero-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero-cat { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--navy); background: var(--gold-light); padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .hero-title { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1.3; color: var(--navy); margin-bottom: 10px; }
+  .hero-title:hover { color: var(--gold); }
+  .hero-excerpt { font-size: 14px; color: var(--body); line-height: 1.7; margin-bottom: 10px; }
+  .art-meta { font-size: 12px; color: var(--subtle); display: flex; gap: 8px; align-items: center; }
+  .art-meta strong { color: var(--body); }
+  .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--subtle); display: inline-block; }
+
+  .hero-side { display: flex; flex-direction: column; }
+  .side-item { display: flex; gap: 10px; cursor: pointer; padding: 12px 0; border-bottom: 1px solid var(--rule); align-items: flex-start; }
+  .side-item:first-child { padding-top: 0; }
+  .side-item:last-child { border-bottom: none; }
+  .side-thumb { width: 80px; height: 62px; border-radius: 7px; overflow: hidden; flex-shrink: 0; background: var(--surface); }
+  .side-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .side-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--navy); background: var(--gold-light); padding: 2px 6px; border-radius: 3px; display: inline-block; margin-bottom: 4px; }
+  .side-title { font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--navy); margin-bottom: 3px; }
+  .side-title:hover { color: var(--gold); }
+  .side-time { font-size: 11px; color: var(--subtle); }
+
+  .sec-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--navy); display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+  .sec-label::before { content: ''; width: 3px; height: 14px; background: var(--gold); border-radius: 2px; display: inline-block; }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .sec-label a { font-size: 11px; font-weight: 500; color: var(--gold); text-decoration: none; letter-spacing: 0; text-transform: none; }
+
+  .cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+  .card { cursor: pointer; }
+  .card-img { width: 100%; aspect-ratio: 3/2; border-radius: 9px; overflow: hidden; margin-bottom: 10px; background: var(--surface); }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s; }
+  .card:hover .card-img img { transform: scale(1.04); }
+  .card-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--navy); background: var(--gold-light); padding: 2px 7px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+  .card-title { font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--navy); margin-bottom: 5px; }
+  .card-title:hover { color: var(--gold); }
+  .card-meta { font-size: 11px; color: var(--subtle); }
+
+  .feature-band { background: var(--navy); border-radius: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 2rem; overflow: hidden; }
+  .feature-band-img { width: 100%; height: 100%; min-height: 220px; }
+  .feature-band-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .feature-band-text { padding: 1.75rem; display: flex; flex-direction: column; justify-content: center; }
+  .fb-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .fb-title { font-family: var(--serif); font-size: 20px; font-weight: 700; line-height: 1.3; color: #fff; margin-bottom: 10px; }
+  .fb-excerpt { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.65; margin-bottom: 14px; }
+  .fb-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+  .fb-read { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--gold); text-decoration: none; }
+  .fb-read:hover { color: var(--gold-bright); }
+
+  footer { background: var(--navy); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .footer-logo { font-family: var(--serif); font-size: 20px; font-weight: 700; color: #fff; }
+  .footer-logo span { color: var(--gold); }
+  .footer-copy { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 3px; }
+  .footer-links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+  .footer-links a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 12px; }
+  .footer-links a:hover { color: var(--gold); }
+
+  .img-loading { background: linear-gradient(90deg, #e4e8f0 25%, #f0f3f8 50%, #e4e8f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+</style>
+
+<div class="site">
+  <div class="topstrip">
+    <div class="topstrip-left">
+      <span class="live-dot">Live coverage</span>
+      <span>Fri, 8 May 2026 · Harare 24°C</span>
+    </div>
+    <div class="topstrip-right">
+      <a href="#">E-Paper</a><a href="#">Newsletter</a><a href="#">Advertise</a>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo">Zim<span>Latest</span>News</div>
+        <div class="logo-sub">Zimbabwe's most trusted source</div>
+      </div>
+      <button class="header-cta">Subscribe free</button>
+    </div>
+    <nav>
+      <a href="#" class="active">Home</a>
+      <a href="#">Politics</a><a href="#">Business</a><a href="#">Sport</a>
+      <a href="#">Health</a><a href="#">Tech</a><a href="#">Diaspora</a>
+      <a href="#">Opinion</a><a href="#">Showbiz</a>
+    </nav>
+  </div>
+
+  <div class="breaking">
+    <span class="breaking-pill">Breaking</span>
+    <span>Warriors seal AFCON qualifier win in Lusaka &nbsp;·&nbsp; ZiG stabilises as RBZ announces new policy &nbsp;·&nbsp; Munetsi poised for Premier League transfer</span>
+  </div>
+
+  <div class="content">
+    <div class="hero">
+      <div class="hero-main">
+        <div class="hero-img img-loading" id="hero-img-wrap">
+          <img id="hero-img" alt="Parliament debates land reform" style="opacity:0;transition:opacity 0.4s;" />
+        </div>
+        <span class="hero-cat">Politics</span>
+        <h1 class="hero-title">Parliament debates constitutional amendment on land reform as opposition demands public hearings</h1>
+        <p class="hero-excerpt">Lawmakers clashed on Thursday over a proposed bill that would alter land ownership provisions, with opposition MPs calling for broader community consultation before any vote is held.</p>
+        <div class="art-meta">
+          <strong>Tendai Moyo</strong><span class="dot"></span>
+          <span>2 hours ago</span><span class="dot"></span><span>4 min read</span>
+        </div>
+      </div>
+
+      <div class="hero-side" id="side-stack"></div>
+    </div>
+
+    <div class="sec-label">Latest News <a href="#">View all →</a></div>
+    <div class="cards-row" id="latest-cards"></div>
+
+    <div class="feature-band">
+      <div class="feature-band-img img-loading" id="feature-img-wrap">
+        <img id="feature-img" alt="" style="opacity:0;transition:opacity 0.4s;" />
+      </div>
+      <div class="feature-band-text">
+        <p class="fb-label">Editor's Pick · Opinion</p>
+        <h2 class="fb-title">Why the ZiG needs structural reform, not just monetary tightening</h2>
+        <p class="fb-excerpt">Zimbabwe's gold-backed currency has shown resilience, but economists warn deeper structural changes are needed before year-end.</p>
+        <p class="fb-meta">Tinashe Makoni, Economist · 2 hrs ago</p>
+        <a class="fb-read" href="#">Read full piece <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      </div>
+    </div>
+
+    <div class="sec-label">Sport <a href="#">View all →</a></div>
+    <div class="cards-row" id="sport-cards"></div>
+  </div>
+
+  <footer>
+    <div>
+      <div class="footer-logo">Zim<span>Latest</span>News</div>
+      <div class="footer-copy">© 2026 zimlatestnews.online — All rights reserved</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">About</a><a href="#">Contact</a><a href="#">Advertise</a><a href="#">Privacy</a><a href="#">Terms</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  function loadImg(imgEl, wrapEl, url) {
+    const i = new Image();
+    i.onload = () => { imgEl.src = url; imgEl.style.opacity = '1'; wrapEl.classList.remove('img-loading'); };
+    i.onerror = () => { wrapEl.classList.remove('img-loading'); };
+    i.src = url;
+  }
+
+  const ids = Array.from({length: 30}, () => Math.floor(Math.random() * 900) + 10);
+  let idx = 0;
+  function nextId() { return ids[idx++]; }
+
+  function picsum(w, h) { return `https://picsum.photos/id/${nextId()}/${w}/${h}`; }
+
+  const heroImg = document.getElementById('hero-img');
+  const heroWrap = document.getElementById('hero-img-wrap');
+  loadImg(heroImg, heroWrap, picsum(800, 450));
+
+  const featureImg = document.getElementById('feature-img');
+  const featureWrap = document.getElementById('feature-img-wrap');
+  loadImg(featureImg, featureWrap, picsum(500, 400));
+
+  const sideData = [
+    { cat: 'Business', title: 'ZiG holds ground as RBZ tightens interbank controls', time: '3 hrs ago' },
+    { cat: 'Sport', title: 'Warriors beat Zambia 2–1 to top AFCON qualifying group', time: '5 hrs ago' },
+    { cat: 'Health', title: 'Free cancer screening programme launches in Bulawayo', time: '6 hrs ago' },
+    { cat: 'Tech', title: 'Econet rolls out 5G pilot in Harare CBD and Borrowdale', time: '8 hrs ago' },
+  ];
+  const sideStack = document.getElementById('side-stack');
+  sideData.forEach(d => {
+    const url = picsum(200, 150);
+    const div = document.createElement('div');
+    div.className = 'side-item';
+    div.innerHTML = `
+      <div class="side-thumb img-loading" id="sw-${idx}">
+        <img id="si-${idx}" alt="" style="opacity:0;transition:opacity 0.3s;" />
+      </div>
+      <div>
+        <p class="side-cat">${d.cat}</p>
+        <p class="side-title">${d.title}</p>
+        <p class="side-time">${d.time}</p>
+      </div>`;
+    sideStack.appendChild(div);
+    const i2 = div.querySelector('img');
+    const w2 = div.querySelector('.side-thumb');
+    loadImg(i2, w2, url);
+  });
+
+  const latestData = [
+    { cat: 'Business', title: 'Tourism sector faces headwinds as global travel spending slows', meta: 'Farai Dube · 4 hrs ago' },
+    { cat: 'Politics', title: 'MPs blast Cottco over unpaid farmers and financial mismanagement', meta: 'Chido Mhaka · 5 hrs ago' },
+    { cat: 'Health', title: 'Shamva records sharp decline in youth HIV prevalence rates', meta: 'Vanessa Gonye · 7 hrs ago' },
+  ];
+  const latestCards = document.getElementById('latest-cards');
+  latestData.forEach(d => {
+    const url = picsum(400, 267);
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <div class="card-img img-loading">
+        <img alt="" style="opacity:0;transition:opacity 0.3s;" />
+      </div>
+      <span class="card-cat">${d.cat}</span>
+      <p class="card-title">${d.title}</p>
+      <p class="card-meta">${d.meta}</p>`;
+    latestCards.appendChild(div);
+    loadImg(div.querySelector('img'), div.querySelector('.card-img'), url);
+  });
+
+  const sportData = [
+    { cat: 'Football', title: 'Peter Ndlovu officially unveiled as Scotland FC head coach', meta: '1 hr ago' },
+    { cat: 'Football', title: 'Munetsi poised for Premier League move after standout season', meta: '3 hrs ago' },
+    { cat: 'Cricket', title: 'Chevrons target ICC World Cup qualification after strong T20 run', meta: '5 hrs ago' },
+  ];
+  const sportCards = document.getElementById('sport-cards');
+  sportData.forEach(d => {
+    const url = picsum(400, 267);
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <div class="card-img img-loading">
+        <img alt="" style="opacity:0;transition:opacity 0.3s;" />
+      </div>
+      <span class="card-cat">${d.cat}</span>
+      <p class="card-title">${d.title}</p>
+      <p class="card-meta">${d.meta}</p>`;
+    sportCards.appendChild(div);
+    loadImg(div.querySelector('img'), div.querySelector('.card-img'), url);
+  });
+</script>

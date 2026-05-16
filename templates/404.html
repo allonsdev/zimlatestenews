@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found — ZimLatestNews{% endblock %}
+{% block newsletter_bar %}{% endblock %}
+
+{% block content %}
+<div class="site-content">
+  <div class="error-page">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page not found</h1>
+    <p class="error-desc">The page you're looking for doesn't exist or has been moved.</p>
+    <a href="{% url 'articles:home' %}" class="btn-home">
+      <i class="ti ti-home"></i> Back to homepage
+    </a>
+  </div>
+</div>
+{% endblock %}

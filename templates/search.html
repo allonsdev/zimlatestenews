@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+
+{% block title %}{% if query %}Search: {{ query }}{% else %}Search{% endif %} — ZimLatestNews{% endblock %}
+
+{% block content %}
+<div class="site-content">
+  <div class="search-header">
+    <h1 style="font-family:var(--serif);font-size:28px;color:var(--navy);margin-bottom:1rem;">Search</h1>
+    <form class="search-form-lg" action="{% url 'articles:search' %}" method="get">
+      <input type="search" name="q" value="{{ query }}" placeholder="Search articles, topics, authors…" autofocus>
+      <button type="submit">Search</button>
+    </form>
+    {% if query %}
+      <p class="search-count">
+        <strong>{{ total }}</strong> result{{ total|pluralize }} for "<strong>{{ query }}</strong>"
+      </p>
+    {% endif %}
+  </div>
+
+  {% if page_obj %}
+    {% for article in page_obj %}
+    <a href="{{ article.get_absolute_url }}" class="search-result">
+      <div class="search-result-thumb shimmer">
+        {% if article.hero_image %}<img src="{{ article.hero_image.url }}" alt="{{ article.title }}" loading="lazy">{% endif %}
+      </div>
+      <div>
+        <span class="cat-pill">{{ article.category.name }}</span>
+        <p class="search-result-title">{{ article.title }}</p>
+        <p class="search-result-excerpt">{{ article.excerpt|truncatewords:20 }}</p>
+        <p class="search-result-meta">{{ article.author.full_name }} · {{ article.published_at|timesince }} ago · {{ article.reading_time }} min read</p>
+      </div>
+    </a>
+    {% endfor %}
+
+    {% include "pagination.html" with page_obj=page_obj %}
+
+  {% elif query %}
+    <div style="text-align:center;padding:3rem 1rem;color:var(--muted);">
+      <i class="ti ti-search-off" style="font-size:48px;display:block;margin-bottom:1rem;"></i>
+      <p style="font-size:18px;font-weight:600;color:var(--navy);margin-bottom:8px;">No results found</p>
+      <p>Try different keywords or browse by <a href="{% url 'categories:list' %}" style="color:var(--gold);">category</a>.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+{# ================================================================
+   articles/author.html
+================================================================= #}
+{% comment %}Save this block as articles/author.html{% endcomment %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Advertise | ZimLatestNews{% endblock %}
+{% block meta_description %}Advertise with ZimLatestNews and reach Zimbabwe's most engaged digital news audience.{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+  <nav class="breadcrumbs">
+    <a href="{% url 'articles:home' %}">Home</a>
+    <span>›</span>
+    <span>Advertise</span>
+  </nav>
+
+  <div class="page-header">
+    <h1>Advertise with Us</h1>
+    <p class="page-subtitle">Reach Zimbabwe's most engaged digital news audience.</p>
+  </div>
+
+  <div class="page-body">
+
+    <div class="about-mission">
+      <div class="about-mission-item">
+        <i class="ti ti-users"></i>
+        <div>
+          <h3>Engaged Audience</h3>
+          <p>Hundreds of thousands of monthly readers across Zimbabwe and the diaspora actively seeking trusted news.</p>
+        </div>
+      </div>
+      <div class="about-mission-item">
+        <i class="ti ti-device-mobile"></i>
+        <div>
+          <h3>Mobile First</h3>
+          <p>All ad placements are fully optimised for mobile, tablet and desktop so your message always looks its best.</p>
+        </div>
+      </div>
+      <div class="about-mission-item">
+        <i class="ti ti-chart-bar"></i>
+        <div>
+          <h3>Transparent Reporting</h3>
+          <p>We provide clear campaign performance reports so you always know exactly what your investment is delivering.</p>
+        </div>
+      </div>
+      <div class="about-mission-item">
+        <i class="ti ti-calendar"></i>
+        <div>
+          <h3>Flexible Campaigns</h3>
+          <p>From single day placements to long term sponsorships, we have packages to suit every budget and timeline.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-story">
+      <h2>Ad Formats</h2>
+
+      <div class="advertise-formats">
+        <div class="advertise-format-item">
+          <div class="advertise-format-icon"><i class="ti ti-layout-navbar"></i></div>
+          <h4>Leaderboard</h4>
+          <p class="advertise-format-size">728 x 90</p>
+          <p>High visibility placement at the top of every page. Maximum reach across the entire site.</p>
+        </div>
+        <div class="advertise-format-item">
+          <div class="advertise-format-icon"><i class="ti ti-layout-sidebar-right"></i></div>
+          <h4>Medium Rectangle</h4>
+          <p class="advertise-format-size">300 x 250</p>
+          <p>Sidebar and inline placements throughout article pages for contextual impact.</p>
+        </div>
+        <div class="advertise-format-item">
+          <div class="advertise-format-icon"><i class="ti ti-file-text"></i></div>
+          <h4>Sponsored Article</h4>
+          <p class="advertise-format-size">Full article</p>
+          <p>Branded editorial content published and promoted across ZimLatestNews as a sponsored piece.</p>
+        </div>
+        <div class="advertise-format-item">
+          <div class="advertise-format-icon"><i class="ti ti-mail"></i></div>
+          <h4>Newsletter Placement</h4>
+          <p class="advertise-format-size">Daily digest</p>
+          <p>Your brand delivered directly to our subscribers inboxes every morning alongside our top stories.</p>
+        </div>
+        <div class="advertise-format-item">
+          <div class="advertise-format-icon"><i class="ti ti-bell-ringing"></i></div>
+          <h4>Breaking News Banner</h4>
+          <p class="advertise-format-size">Full width</p>
+          <p>Prominent placement on our breaking news ticker, seen by every visitor at the top of the site.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-contact">
+      <h2>Request the Media Kit</h2>
+      <p style="color:var(--body);margin-bottom:1.5rem;">Contact our advertising team to receive our full media kit including audience data, rate card and case studies.</p>
+      <div class="contact-info-block">
+        <div class="contact-info-item">
+          <i class="ti ti-mail"></i>
+          <span><a href="mailto:ads@zimlatestnews.online">ads@zimlatestnews.online</a></span>
+        </div>
+        <div class="contact-info-item">
+          <i class="ti ti-phone"></i>
+          <span>+263 77 000 0000</span>
+        </div>
+        <div class="contact-info-item">
+          <i class="ti ti-clock"></i>
+          <span>Mon to Fri, 8am to 5pm CAT</span>
+        </div>
+      </div>
+      <a href="{% url 'pages:contact' %}" class="btn-submit" style="display:inline-block;text-decoration:none;margin-top:1rem;">
+        Get in touch <i class="ti ti-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

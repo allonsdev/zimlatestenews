@@ -1,0 +1,263 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>{% block title %}ZimLatestNews — Zimbabwe's Most Trusted Source{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Breaking news, politics, business, sport and more from Zimbabwe.{% endblock %}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title"       content="{% block og_title %}ZimLatestNews{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Breaking news from Zimbabwe.{% endblock %}">
+  <meta property="og:url"         content="{{ request.build_absolute_uri }}">
+  <meta property="og:image"       content="{% block og_image %}{% static 'img/og-default.jpg' %}{% endblock %}">
+  <meta property="og:site_name"   content="ZimLatestNews">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="{% block twitter_title %}ZimLatestNews{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Breaking news from Zimbabwe.{% endblock %}">
+  <meta name="twitter:image"       content="{% block twitter_image %}{% static 'img/og-default.jpg' %}{% endblock %}">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+          crossorigin="anonymous"></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ================================================================
+     TOP STRIP
+================================================================= -->
+<div class="topstrip">
+  <div class="topstrip-left">
+    <span class="live-dot">Live coverage</span>
+    <span id="live-date"></span>
+  </div>
+  <div class="topstrip-right">
+    <a href="{% url 'pages:detail' 'epaper' %}">E-Paper</a>
+    <a href="{% url 'pages:detail' 'newsletter' %}">Newsletter</a>
+    <a href="{% url 'pages:detail' 'advertise' %}">Advertise</a>
+  </div>
+</div>
+
+<!-- ================================================================
+     HEADER
+================================================================= -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <a href="{% url 'articles:home' %}">
+        <div class="logo">Zim<span>Latest</span>News</div>
+        <div class="logo-sub">Zimbabwe's most trusted source</div>
+      </a>
+      <div class="header-actions">
+        <button class="btn-search" id="btn-search" aria-label="Search">
+          <i class="ti ti-search"></i>
+        </button>
+        <a href="{% url 'pages:newsletter_subscribe' %}" class="btn-subscribe">Subscribe free</a>
+        <button class="btn-menu" id="btn-menu" aria-label="Menu" aria-expanded="false">
+          <i class="ti ti-menu-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Desktop nav -->
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="{% url 'articles:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Home</a>
+      {% for cat in nav_categories %}
+        <a href="{{ cat.get_absolute_url }}"
+           {% if request.resolver_match.kwargs.slug == cat.slug %}class="active"{% endif %}>
+          {{ cat.name }}
+        </a>
+      {% endfor %}
+    </nav>
+  </div>
+
+  <!-- Search bar (hidden by default) -->
+  <div class="search-bar" id="search-bar">
+    <form action="{% url 'articles:search' %}" method="get" style="display:flex;gap:8px;flex:1;">
+      <input type="search" name="q" placeholder="Search ZimLatestNews…" value="{{ request.GET.q }}" autocomplete="off">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+</header>
+
+<!-- Mobile nav drawer -->
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+  <a href="{% url 'articles:home' %}"><i class="ti ti-home"></i> Home</a>
+  {% for cat in nav_categories %}
+    <a href="{{ cat.get_absolute_url }}">
+      {% if cat.icon %}<i class="ti {{ cat.icon }}"></i>{% endif %} {{ cat.name }}
+    </a>
+  {% endfor %}
+  <a href="{% url 'pages:contact' %}"><i class="ti ti-mail"></i> Contact</a>
+</nav>
+
+<!-- ================================================================
+     BREAKING NEWS TICKER
+================================================================= -->
+{% if ticker_items %}
+<div class="breaking-bar">
+  <span class="breaking-pill">Breaking</span>
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      {% for item in ticker_items %}
+        <span class="ticker-item">
+          {% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}
+          &nbsp;&nbsp;·&nbsp;&nbsp;
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ================================================================
+     LEADERBOARD AD — top of page
+================================================================= -->
+{% if leaderboard_top %}
+<div class="container">
+  <div class="ad-slot ad-slot--leaderboard"
+       data-ad-client="{{ leaderboard_top.adsense_publisher_id }}"
+       data-ad-slot="{{ leaderboard_top.adsense_slot_id }}"
+       data-ad-id="{{ leaderboard_top.pk }}"
+       aria-label="Advertisement">
+  </div>
+</div>
+{% endif %}
+
+<!-- ================================================================
+     FLASH MESSAGES
+================================================================= -->
+{% if messages %}
+<div class="container">
+  <ul class="messages" role="alert">
+    {% for message in messages %}
+      <li class="message message--{{ message.tags }}">
+        <i class="ti {% if message.tags == 'success' %}ti-circle-check{% elif message.tags == 'error' %}ti-alert-circle{% else %}ti-info-circle{% endif %}"></i>
+        {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<!-- ================================================================
+     MAIN PAGE CONTENT
+================================================================= -->
+<main id="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ================================================================
+     NEWSLETTER BAR (shown on most pages, hidden on newsletter page)
+================================================================= -->
+{% block newsletter_bar %}
+<div class="container">
+  <div class="newsletter-bar">
+    <h2>Stay ahead of the news</h2>
+    <p>Get Zimbabwe's top stories delivered to your inbox every morning — free.</p>
+    <form class="newsletter-form" action="{% url 'pages:newsletter_subscribe' %}" method="post">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="Your email address" required>
+      <button type="submit">Subscribe</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+<!-- ================================================================
+     FOOTER
+================================================================= -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-logo-wrap">
+      <a href="{% url 'articles:home' %}">
+        <div class="logo">Zim<span>Latest</span>News</div>
+      </a>
+      <p class="footer-tagline">Zimbabwe's most trusted independent<br>news source since 2025.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><i class="ti ti-brand-facebook"></i></a>
+        <a href="#" aria-label="Twitter/X"><i class="ti ti-brand-x"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="ti ti-brand-whatsapp"></i></a>
+        <a href="#" aria-label="YouTube"><i class="ti ti-brand-youtube"></i></a>
+        <a href="#" aria-label="Instagram"><i class="ti ti-brand-instagram"></i></a>
+      </div>
+    </div>
+
+    <div>
+      <p class="footer-col-title">Sections</p>
+      <ul class="footer-links-list">
+        {% for cat in nav_categories %}
+          <li><a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-col-title">Company</p>
+      <ul class="footer-links-list">
+        <li><a href="{% url 'pages:detail' 'about' %}">About Us</a></li>
+        <li><a href="{% url 'pages:contact' %}">Contact</a></li>
+        <li><a href="{% url 'pages:detail' 'advertise' %}">Advertise</a></li>
+        <li><a href="{% url 'pages:detail' 'privacy' %}">Privacy Policy</a></li>
+        <li><a href="{% url 'pages:detail' 'terms' %}">Terms of Use</a></li>
+        <li><a href="/sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">© {% now "Y" %} zimlatestnews.online — All rights reserved</p>
+    <div class="footer-bottom-links">
+      <a href="{% url 'pages:detail' 'privacy' %}">Privacy</a>
+      <a href="{% url 'pages:detail' 'terms' %}">Terms</a>
+      <a href="{% url 'pages:contact' %}">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to top -->
+<button class="back-to-top" id="back-to-top" aria-label="Back to top">
+  <i class="ti ti-arrow-up"></i>
+</button>
+
+<!-- ================================================================
+     SCRIPTS
+================================================================= -->
+<script src="{% static 'js/main.js' %}"></script>
+
+<script>
+  (function () {
+    const el = document.getElementById('live-date');
+    if (!el) return;
+    function update() {
+      const now = new Date();
+      el.textContent = now.toLocaleDateString('en-ZW', { weekday:'short', day:'numeric', month:'short', year:'numeric' })
+        + ' · Harare ' + now.toLocaleTimeString('en-ZW', { hour:'2-digit', minute:'2-digit' });
+    }
+    update();
+    setInterval(update, 60000);
+  })();
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

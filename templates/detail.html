@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.display_title }} — ZimLatestNews{% endblock %}
+{% block meta_description %}{{ article.display_description }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ article.display_title }}{% endblock %}
+{% block og_description %}{{ article.display_description }}{% endblock %}
+{% block og_image %}{% if article.og_image %}{{ request.scheme }}://{{ request.get_host }}{{ article.og_image.url }}{% elif article.hero_image %}{{ request.scheme }}://{{ request.get_host }}{{ article.hero_image.url }}{% endif %}{% endblock %}
+
+{% block newsletter_bar %}{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+ 
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{% url 'articles:home' %}">Home</a>
+    <span>›</span>
+    {% if article.category %}
+      <a href="{{ article.category.get_absolute_url }}">{{ article.category.name }}</a>
+      <span>›</span>
+    {% endif %}
+    <span>{{ article.title|truncatewords:8 }}</span>
+  </nav>
+
+  <div class="article-layout">
+
+ 
+    <article class="article-body-wrap">
+
+  
+      {% if sponsorship and sponsorship.is_live %}
+      <div class="sponsored-bar">
+        <strong>Sponsored:</strong> {{ sponsorship.disclosure_text }}
+      </div>
+      {% endif %}
+
+
+      <div class="article-category">
+        {% if article.category %}<a href="{{ article.category.get_absolute_url }}" class="cat-pill">{{ article.category.name }}</a>{% endif %}
+        {% if article.is_breaking %}<span class="cat-pill cat-pill--breaking" style="background:#ef4444;color:#fff;margin-left:6px;">Breaking</span>{% endif %}
+      </div>
+
+      <h1 class="article-title">{{ article.title }}</h1>
+      {% if article.subtitle %}<p class="article-subtitle">{{ article.subtitle }}</p>{% endif %}
+
+      <div class="article-meta">
+        {% if article.author %}
+        <div class="author-chip">
+          {% if article.author.photo %}
+            <img src="{{ article.author.photo.url }}" alt="{{ article.author.full_name }}">
+          {% endif %}
+          <div>
+            <a href="{{ article.author.get_absolute_url }}" class="author-name">{{ article.author.full_name }}</a>
+            {% if article.author.title %}<div style="font-size:11px;color:var(--muted)">{{ article.author.title }}</div>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+        <span class="dot"></span>
+        <time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j M Y, g:i A" }}</time>
+        <span class="dot"></span>
+        <span class="reading-badge"><i class="ti ti-clock"></i> {{ article.reading_time }} min read</span>
+        <span class="dot"></span>
+        <span><i class="ti ti-eye"></i> {{ article.views }} views</span>
+      </div>
+
+
+      {% if article.hero_image %}
+      <div class="article-hero-img shimmer">
+        <img src="{{ article.hero_image.url }}" alt="{{ article.title }}" loading="eager">
+      </div>
+      {% if article.hero_image_caption or article.hero_image_credit %}
+      <p class="img-caption">
+        {{ article.hero_image_caption }}
+        {% if article.hero_image_credit %}<em>— {{ article.hero_image_credit }}</em>{% endif %}
+      </p>
+      {% endif %}
+      {% endif %}
+
+      {% if in_article_1 and article.show_ads %}
+      <div class="ad-slot ad-slot--in-article"
+           data-ad-client="{{ in_article_1.adsense_publisher_id }}"
+           data-ad-slot="{{ in_article_1.adsense_slot_id }}"
+           data-ad-id="{{ in_article_1.pk }}"
+           aria-label="Advertisement">
+      </div>
+      {% endif %}
+
+
+      <div class="article-body">
+        {{ article.body|safe }}
+      </div>
+
+      {% if in_article_2 and article.show_ads %}
+      <div class="ad-slot ad-slot--in-article"
+           data-ad-client="{{ in_article_2.adsense_publisher_id }}"
+           data-ad-slot="{{ in_article_2.adsense_slot_id }}"
+           data-ad-id="{{ in_article_2.pk }}"
+           aria-label="Advertisement">
+      </div>
+      {% endif %}
+
+      {% if tags %}
+      <div class="article-tags">
+        {% for tag in tags %}
+          <a href="{% url 'articles:tag' tag.slug %}" class="tag-chip"># {{ tag.name }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="share-bar">
+        <span class="share-label">Share</span>
+        <a id="share-twitter"  class="share-btn share-btn--twitter"  href="#" target="_blank" rel="noopener">
+          <i class="ti ti-brand-x"></i> X
+        </a>
+        <a id="share-facebook" class="share-btn share-btn--facebook" href="#" target="_blank" rel="noopener">
+          <i class="ti ti-brand-facebook"></i> Facebook
+        </a>
+        <a id="share-whatsapp" class="share-btn share-btn--whatsapp" href="#" target="_blank" rel="noopener">
+          <i class="ti ti-brand-whatsapp"></i> WhatsApp
+        </a>
+        <button id="share-copy" class="share-btn share-btn--copy">
+          <i class="ti ti-copy"></i> Copy link
+        </button>
+      </div>
+
+      {% if article.allow_comments %}
+      <section class="comments-section" id="comments">
+        <h2 class="comments-title">{{ comment_count }} Comment{{ comment_count|pluralize }}</h2>
+
+        <div class="comment-form">
+          <h3>Leave a comment</h3>
+          <form action="{% url 'articles:submit_comment' article.slug %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="parent_id" value="">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="comment-name">Name *</label>
+                <input type="text" id="comment-name" name="name" required placeholder="Your name">
+              </div>
+              <div class="form-group">
+                <label for="comment-email">Email * <small style="font-weight:400;color:var(--subtle)">(not published)</small></label>
+                <input type="email" id="comment-email" name="email" required placeholder="your@email.com">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="comment-body">Comment *</label>
+              <textarea id="comment-body" name="body" required placeholder="Share your thoughts…"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Post comment</button>
+          </form>
+        </div>
+
+        {% for comment in comments %}
+        <div class="comment-item" id="comment-{{ comment.pk }}">
+          <div class="comment-header">
+            <span class="comment-name">{{ comment.name }}</span>
+            <span class="comment-date">{{ comment.created_at|date:"j M Y, g:i A" }}</span>
+          </div>
+          <p class="comment-body">{{ comment.body }}</p>
+          <button class="comment-reply-btn" data-comment-id="{{ comment.pk }}">Reply</button>
+
+
+          <div id="reply-form-{{ comment.pk }}" style="display:none;margin-top:10px;">
+            <form action="{% url 'articles:submit_comment' article.slug %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="parent_id" value="{{ comment.pk }}">
+              <div class="form-row">
+                <div class="form-group">
+                  <input type="text" name="name" required placeholder="Your name">
+                </div>
+                <div class="form-group">
+                  <input type="email" name="email" required placeholder="your@email.com">
+                </div>
+              </div>
+              <div class="form-group">
+                <textarea name="body" required placeholder="Your reply…" style="min-height:80px;"></textarea>
+              </div>
+              <button type="submit" class="btn-submit" style="font-size:13px;padding:8px 18px;">Post reply</button>
+            </form>
+          </div>
+
+
+          {% if comment.replies.all %}
+          <div class="comment-replies">
+            {% for reply in comment.replies.all %}
+              {% if reply.is_approved %}
+              <div class="comment-item">
+                <div class="comment-header">
+                  <span class="comment-name">{{ reply.name }}</span>
+                  <span class="comment-date">{{ reply.created_at|date:"j M Y" }}</span>
+                </div>
+                <p class="comment-body">{{ reply.body }}</p>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% empty %}
+          <p style="color:var(--muted);font-size:14px;padding:1rem 0;">Be the first to comment.</p>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+    </article>
+
+
+    <aside class="article-sidebar">
+
+
+      {% if sidebar_top and article.show_ads %}
+      <div class="ad-slot ad-slot--sidebar"
+           data-ad-client="{{ sidebar_top.adsense_publisher_id }}"
+           data-ad-slot="{{ sidebar_top.adsense_slot_id }}"
+           data-ad-id="{{ sidebar_top.pk }}"
+           aria-label="Advertisement">
+      </div>
+      {% endif %}
+
+
+      {% if related %}
+      <div>
+        <p class="sidebar-section-title">Related Stories</p>
+        {% for r in related %}
+        <a href="{{ r.get_absolute_url }}" class="sidebar-card">
+          <div class="sidebar-card-thumb shimmer">
+            {% if r.hero_image %}<img src="{{ r.hero_image.url }}" alt="{{ r.title }}" loading="lazy">{% endif %}
+          </div>
+          <div>
+            <p class="sidebar-card-title">{{ r.title }}</p>
+            <p class="sidebar-card-time">{{ r.published_at|timesince }} ago</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if sidebar_sticky and article.show_ads %}
+      <div class="ad-slot ad-slot--sidebar"
+           data-ad-client="{{ sidebar_sticky.adsense_publisher_id }}"
+           data-ad-slot="{{ sidebar_sticky.adsense_slot_id }}"
+           data-ad-id="{{ sidebar_sticky.pk }}"
+           aria-label="Advertisement">
+      </div>
+      {% endif %}
+
+    </aside>
+  </div>
+
+
+  {% if related %}
+  <div class="related-strip">
+    <div class="sec-label">More Stories</div>
+    <div class="related-grid">
+      {% for r in related %}
+        {% include "article_card.html" with article=r %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+
+<a href="{{ article.get_absolute_url }}" class="card">
+  <div class="card-img shimmer">
+    {% if article.hero_image %}
+      <img src="{{ article.hero_image.url }}" alt="{{ article.title }}" loading="lazy">
+    {% endif %}
+  </div>
+  <span class="cat-pill">{{ article.category.name }}</span>
+  <p class="card-title">{{ article.title }}</p>
+  <p class="card-meta">{{ article.author.full_name }} · {{ article.published_at|timesince }} ago</p>
+</a>

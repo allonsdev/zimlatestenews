@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error — ZimLatestNews{% endblock %}
+{% block newsletter_bar %}{% endblock %}
+
+{% block content %}
+<div class="site-content">
+  <div class="error-page">
+    <div class="error-code">500</div>
+    <h1 class="error-title">Something went wrong</h1>
+    <p class="error-desc">We're having a technical issue. Our team has been notified. Please try again shortly.</p>
+    <a href="{% url 'articles:home' %}" class="btn-home">
+      <i class="ti ti-home"></i> Back to homepage
+    </a>
+  </div>
+</div>
+{% endblock %}

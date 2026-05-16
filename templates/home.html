@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ZimLatestNews — Zimbabwe's Most Trusted News Source{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+  <!-- HERO SECTION -->
+  {% if hero %}
+  <div class="hero">
+
+    <!-- Main hero article -->
+    <a href="{{ hero.get_absolute_url }}" class="hero-main">
+      <div class="hero-img shimmer">
+        {% if hero.hero_image %}
+          <img src="{{ hero.hero_image.url }}" alt="{{ hero.title }}" loading="eager">
+        {% endif %}
+      </div>
+      <span class="cat-pill">{{ hero.category.name }}</span>
+      <h1 class="hero-title">{{ hero.title }}</h1>
+      <p class="hero-excerpt">{{ hero.excerpt }}</p>
+      <div class="art-meta">
+        <strong>{{ hero.author.full_name }}</strong>
+        <span class="dot"></span>
+        <span>{{ hero.published_at|timesince }} ago</span>
+        <span class="dot"></span>
+        <span>{{ hero.reading_time }} min read</span>
+      </div>
+    </a>
+
+    <!-- Side stack — 4 articles -->
+    <div class="hero-side">
+      {% for article in side_articles %}
+      <a href="{{ article.get_absolute_url }}" class="side-item">
+        <div class="side-thumb shimmer">
+          {% if article.hero_image %}
+            <img src="{{ article.hero_image.url }}" alt="{{ article.title }}" loading="lazy">
+          {% endif %}
+        </div>
+        <div>
+          <span class="cat-pill">{{ article.category.name }}</span>
+          <p class="side-title">{{ article.title }}</p>
+          <p class="side-time">{{ article.published_at|timesince }} ago</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>
+  {% endif %}
+
+  <!-- LATEST NEWS -->
+  <div class="sec-label">Latest News <a href="{% url 'articles:search' %}">View all →</a></div>
+  <div class="cards-row">
+    {% for article in latest %}
+      {% include "article_card.html" with article=article %}
+    {% endfor %}
+  </div>
+
+  <!-- BETWEEN CARDS AD -->
+  {% if between_cards %}
+  <div class="ad-slot ad-slot--leaderboard"
+       data-ad-client="{{ between_cards.adsense_publisher_id }}"
+       data-ad-slot="{{ between_cards.adsense_slot_id }}"
+       data-ad-id="{{ between_cards.pk }}"
+       aria-label="Advertisement">
+  </div>
+  {% endif %}
+
+  <!-- EDITOR'S PICK FEATURE BAND -->
+  {% if editors_pick %}
+  <div class="feature-band">
+    <div class="feature-band-img shimmer">
+      {% if editors_pick.hero_image %}
+        <img src="{{ editors_pick.hero_image.url }}" alt="{{ editors_pick.title }}" loading="lazy">
+      {% endif %}
+    </div>
+    <div class="feature-band-text">
+      <p class="fb-label">Editor's Pick · {{ editors_pick.category.name }}</p>
+      <h2 class="fb-title">{{ editors_pick.title }}</h2>
+      <p class="fb-excerpt">{{ editors_pick.excerpt|truncatewords:30 }}</p>
+      <p class="fb-meta">{{ editors_pick.author.full_name }} · {{ editors_pick.published_at|timesince }} ago</p>
+      <a class="fb-read" href="{{ editors_pick.get_absolute_url }}">
+        Read full piece <i class="ti ti-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- POLITICS SECTION -->
+  {% if politics_articles %}
+  <div class="sec-label">Politics <a href="{% url 'categories:detail' 'politics' %}">View all →</a></div>
+  <div class="cards-row">
+    {% for article in politics_articles %}
+      {% include "article_card.html" with article=article %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- SPORT SECTION -->
+  {% if sport_articles %}
+  <div class="sec-label">Sport <a href="{% url 'categories:detail' 'sport' %}">View all →</a></div>
+  <div class="cards-row">
+    {% for article in sport_articles %}
+      {% include "article_card.html" with article=article %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

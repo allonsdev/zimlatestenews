@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}About Us | ZimLatestNews{% endblock %}
+{% block meta_description %}Learn about ZimLatestNews, Zimbabwe's most trusted independent news source since 2025.{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+  <nav class="breadcrumbs">
+    <a href="{% url 'articles:home' %}">Home</a>
+    <span>›</span>
+    <span>About Us</span>
+  </nav>
+
+  <div class="page-header">
+    <h1>About Us</h1>
+    <p class="page-subtitle">Zimbabwe's most trusted independent news source since 2025.</p>
+  </div>
+
+  <div class="page-body">
+
+    <div class="about-mission">
+      <div class="about-mission-item">
+        <i class="ti ti-target"></i>
+        <div>
+          <h3>Our Mission</h3>
+          <p>To inform, educate and empower Zimbabweans at home and in the diaspora with credible, fearless journalism.</p>
+        </div>
+      </div>
+      <div class="about-mission-item">
+        <i class="ti ti-eye"></i>
+        <div>
+          <h3>Editorial Standards</h3>
+          <p>We follow strict editorial guidelines to ensure every story is verified before publication. Corrections are published promptly and transparently.</p>
+        </div>
+      </div>
+      <div class="about-mission-item">
+        <i class="ti ti-users"></i>
+        <div>
+          <h3>Our Team</h3>
+          <p>Our newsroom is staffed by experienced journalists based in Harare, Bulawayo and across the country.</p>
+        </div>
+      </div>
+      <div class="about-mission-item">
+        <i class="ti ti-map-pin"></i>
+        <div>
+          <h3>Where We Are</h3>
+          <p>Headquartered in Harare, Zimbabwe, with correspondents covering all provinces and the Zimbabwean diaspora worldwide.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-story">
+      <h2>Our Story</h2>
+      <p>ZimLatestNews was founded in 2025 with a single purpose: to give Zimbabweans a reliable, independent and digital first news platform they could trust. In a media landscape often shaped by political and commercial pressures, we set out to do things differently.</p>
+      <p>We cover politics, business, sport, health, technology and entertainment with the same commitment to accuracy and fairness. Every story we publish is held to the same standard regardless of who it involves.</p>
+      <p>Today ZimLatestNews reaches hundreds of thousands of readers every month across Zimbabwe and the diaspora. We remain proudly independent and committed to the public interest.</p>
+    </div>
+
+    <div class="about-contact">
+      <h2>Get in Touch</h2>
+      <div class="contact-info-block">
+        <div class="contact-info-item">
+          <i class="ti ti-mail"></i>
+          <span><a href="mailto:news@zimlatestnews.online">news@zimlatestnews.online</a></span>
+        </div>
+        <div class="contact-info-item">
+          <i class="ti ti-phone"></i>
+          <span>+263 77 000 0000</span>
+        </div>
+        <div class="contact-info-item">
+          <i class="ti ti-map-pin"></i>
+          <span>Harare, Zimbabwe</span>
+        </div>
+        <div class="contact-info-item">
+          <i class="ti ti-clock"></i>
+          <span>Mon to Fri, 8am to 5pm CAT</span>
+        </div>
+      </div>
+      <a href="{% url 'pages:contact' %}" class="btn-submit" style="display:inline-block;text-decoration:none;margin-top:1rem;">
+        Contact us <i class="ti ti-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
