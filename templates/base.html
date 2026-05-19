@@ -42,9 +42,7 @@
 </head>
 <body>
 
-<!-- ================================================================
-     TOP STRIP
-================================================================= -->
+
 <div class="topstrip">
   <div class="topstrip-left">
     <span class="live-dot">Live coverage</span>
@@ -57,9 +55,6 @@
   </div>
 </div>
 
-<!-- ================================================================
-     HEADER
-================================================================= -->
 <header class="site-header">
   <div class="header-inner">
     <div class="header-top">
@@ -110,9 +105,7 @@
   <a href="{% url 'pages:contact' %}"><i class="ti ti-mail"></i> Contact</a>
 </nav>
 
-<!-- ================================================================
-     BREAKING NEWS TICKER
-================================================================= -->
+
 {% if ticker_items %}
 <div class="breaking-bar">
   <span class="breaking-pill">Breaking</span>
@@ -129,9 +122,6 @@
 </div>
 {% endif %}
 
-<!-- ================================================================
-     LEADERBOARD AD — top of page
-================================================================= -->
 {% if leaderboard_top %}
 <div class="container">
   <div class="ad-slot ad-slot--leaderboard"
@@ -143,9 +133,6 @@
 </div>
 {% endif %}
 
-<!-- ================================================================
-     FLASH MESSAGES
-================================================================= -->
 {% if messages %}
 <div class="container">
   <ul class="messages" role="alert">
@@ -159,16 +146,11 @@
 </div>
 {% endif %}
 
-<!-- ================================================================
-     MAIN PAGE CONTENT
-================================================================= -->
+
 <main id="main-content">
   {% block content %}{% endblock %}
 </main>
 
-<!-- ================================================================
-     NEWSLETTER BAR (shown on most pages, hidden on newsletter page)
-================================================================= -->
 {% block newsletter_bar %}
 <div class="container">
   <div class="newsletter-bar">
@@ -183,9 +165,6 @@
 </div>
 {% endblock %}
 
-<!-- ================================================================
-     FOOTER
-================================================================= -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-logo-wrap">
@@ -238,10 +217,6 @@
 <button class="back-to-top" id="back-to-top" aria-label="Back to top">
   <i class="ti ti-arrow-up"></i>
 </button>
-
-<!-- ================================================================
-     SCRIPTS
-================================================================= -->
 <script src="{% static 'js/main.js' %}"></script>
 
 <script>

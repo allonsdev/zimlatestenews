@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ category.name }} — ZimLatestNews{% endblock %}
+{% block meta_description %}{{ category.seo_description|default:category.description|default:"Latest news from ZimLatestNews" }}{% endblock %}
+{% block og_title %}{{ category.name }} — ZimLatestNews{% endblock %}
+{% block og_description %}{{ category.seo_description|default:category.description }}{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{% url 'articles:home' %}">Home</a>
+    <span>›</span>
+    {% for ancestor in ancestors %}
+      <a href="{{ ancestor.get_absolute_url }}">{{ ancestor.name }}</a>
+      <span>›</span>
+    {% endfor %}
+    <span>{{ category.name }}</span>
+  </nav>
+
+  <!-- CATEGORY HEADER — uses .category-hero from main.css section 20 -->
+  <div class="category-hero">
+    {% if category.icon %}
+      <span class="category-hero-icon"><i class="ti {{ category.icon }}"></i></span>
+    {% endif %}
+    <div>
+      <div class="category-hero-name">{{ category.name }}</div>
+      {% if category.description %}
+        <div class="category-hero-desc">{{ category.description }}</div>
+      {% endif %}
+      <div class="category-hero-count">{{ total }} article{{ total|pluralize }}</div>
+    </div>
+  </div>
+
+  <!-- SUB-CATEGORIES — uses .subcat-chips from main.css section 20 -->
+  {% if sub_cats %}
+  <div class="subcat-chips">
+    {% for sub in sub_cats %}
+      <a href="{{ sub.get_absolute_url }}" class="subcat-chip">
+        {% if sub.icon %}<i class="ti {{ sub.icon }}"></i> {% endif %}{{ sub.name }}
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- LEADERBOARD AD -->
+  {% if leaderboard %}
+  <div class="ad-slot ad-slot--leaderboard"
+       data-ad-client="{{ leaderboard.adsense_publisher_id }}"
+       data-ad-slot="{{ leaderboard.adsense_slot_id }}"
+       data-ad-id="{{ leaderboard.pk }}"
+       aria-label="Advertisement">
+  </div>
+  {% endif %}
+
+  <!-- HERO ARTICLE — reuses .hero-main / .hero-img / .hero-title from main.css section 12 -->
+  {% if hero %}
+  <a href="{{ hero.get_absolute_url }}" class="hero-main" style="display:block;margin-bottom:2rem;">
+    <div class="hero-img shimmer">
+      {% if hero.hero_image %}
+        <img src="{{ hero.hero_image.url }}" alt="{{ hero.title }}" loading="eager">
+      {% endif %}
+    </div>
+    {% if hero.is_breaking %}
+      <span class="cat-pill" style="background:#ef4444;color:#fff;">Breaking</span>
+    {% else %}
+      <span class="cat-pill">{{ category.name }}</span>
+    {% endif %}
+    <h1 class="hero-title">{{ hero.title }}</h1>
+    <p class="hero-excerpt">{{ hero.excerpt|truncatewords:30 }}</p>
+    <div class="art-meta">
+      {% if hero.author %}<strong>{{ hero.author.full_name }}</strong><span class="dot"></span>{% endif %}
+      <span>{{ hero.published_at|timesince }} ago</span>
+      <span class="dot"></span>
+      <span><i class="ti ti-clock"></i> {{ hero.reading_time }} min read</span>
+    </div>
+  </a>
+  {% endif %}
+
+  <!-- ARTICLES GRID — reuses .cards-row / .sec-label from main.css sections 11 & 13 -->
+  {% if page_obj.object_list %}
+    <div class="sec-label">
+      All {{ category.name }} Stories
+      <span style="font-size:11px;font-weight:400;color:var(--muted);letter-spacing:0;text-transform:none;">{{ total }} article{{ total|pluralize }}</span>
+    </div>
+    <div class="cards-row">
+      {% for article in page_obj %}
+        {% include "article_card.html" with article=article %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align:center;padding:4rem 1rem;color:var(--muted);">
+      <i class="ti ti-news-off" style="font-size:3rem;display:block;margin-bottom:1rem;opacity:.4;"></i>
+      <p style="font-size:15px;margin-bottom:1.25rem;">No articles in this category yet. Check back soon.</p>
+      <a href="{% url 'articles:home' %}" class="btn-submit" style="display:inline-block;">← Back to Home</a>
+    </div>
+  {% endif %}
+
+  <!-- PAGINATION — uses .pagination / .page-item from main.css section 17 -->
+  {% if page_obj.has_other_pages %}
+  <nav class="pagination" aria-label="Page navigation">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="page-item page-item--prev">‹</a>
+    {% else %}
+      <span class="page-item disabled">‹</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <span class="page-item active">{{ num }}</span>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?page={{ num }}" class="page-item">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="page-item page-item--next">›</a>
+    {% else %}
+      <span class="page-item disabled">›</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+</div>
+{% endblock %}

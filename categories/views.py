@@ -9,7 +9,7 @@ from ads.models import AdUnit
 
 class CategoryListView(View):
     """All categories overview page — like a sitemap of topics."""
-    template_name = 'list.html'
+    template_name = 'category_list.html'
 
     def get(self, request):
         # Top-level only; children nested under them
@@ -25,7 +25,7 @@ class CategoryListView(View):
 
 class CategoryDetailView(View):
     """Landing page for a single category — shows articles, sub-cats, hero."""
-    template_name = 'detail.html'
+    template_name = 'category_detail.html'
     paginate_by = 12
 
     def get(self, request, slug):

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}All Categories — ZimLatestNews{% endblock %}
+{% block meta_description %}Browse all news categories on ZimLatestNews — Zimbabwe's most trusted source.{% endblock %}
+
+{% block content %}
+<div class="site-content">
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{% url 'articles:home' %}">Home</a>
+    <span>›</span>
+    <span>All Categories</span>
+  </nav>
+
+  <div class="sec-label">Browse by Topic</div>
+
+  <!-- CATEGORIES GRID — uses .cards-row layout from main.css section 13 -->
+  <div class="cards-row">
+    {% for cat in top_level %}
+    <a href="{{ cat.get_absolute_url }}" class="card" style="text-decoration:none;">
+
+      <!-- Cover image or gold placeholder -->
+      <div class="card-img shimmer" style="{% if not cat.cover_image %}background:var(--navy);display:flex;align-items:center;justify-content:center;{% endif %}">
+        {% if cat.cover_image %}
+          <img src="{{ cat.cover_image.url }}" alt="{{ cat.name }}" loading="lazy">
+        {% else %}
+          <i class="ti {{ cat.icon|default:'ti-news' }}" style="font-size:2.5rem;color:var(--gold);opacity:.9;"></i>
+        {% endif %}
+      </div>
+
+      <!-- Category pill -->
+      <span class="cat-pill">
+        {% if cat.icon %}<i class="ti {{ cat.icon }}"></i> {% endif %}{{ cat.name }}
+      </span>
+
+      <!-- Title = category name -->
+      <p class="card-title" style="font-size:15px;">{{ cat.name }}</p>
+
+      {% if cat.description %}
+        <p class="card-meta" style="font-size:12px;color:var(--body);line-height:1.5;margin-bottom:4px;">
+          {{ cat.description|truncatewords:12 }}
+        </p>
+      {% endif %}
+
+      <p class="card-meta">{{ cat.article_count }} article{{ cat.article_count|pluralize }}</p>
+
+      <!-- Sub-category chips -->
+      {% if cat.children.all %}
+      <div class="subcat-chips" style="margin-top:8px;">
+        {% for sub in cat.children.all %}
+          {% if sub.is_active %}
+            <span class="subcat-chip" style="font-size:10px;padding:3px 10px;">{{ sub.name }}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </a>
+    {% empty %}
+      <p style="color:var(--muted);padding:2rem 0;grid-column:1/-1;">No categories found.</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
