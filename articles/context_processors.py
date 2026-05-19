@@ -1,29 +1,36 @@
 # articles/context_processors.py
-#
-# Add to settings.py TEMPLATES[0]['OPTIONS']['context_processors']:
-#   'articles.context_processors.global_context'
+# Add this file to your articles app, then register it in settings.py
 
 from categories.models import Category
-from pages.models import TickerItem
 from ads.models import AdUnit
 
 
 def global_context(request):
     """
-    Injects into every template:
-      - nav_categories   : top-level categories shown in the nav bar
-      - ticker_items     : active breaking news ticker items
-      - leaderboard_top  : top leaderboard ad unit
+    Injects variables needed on every page:
+      - nav_categories  → header/footer nav links
+      - ticker_items    → breaking news ticker
+      - leaderboard_top → top-of-page ad (base.html)
     """
+    # Nav categories
     nav_categories = Category.objects.filter(
         show_in_nav=True, is_active=True
     ).order_by('nav_order')
 
-    ticker_items = TickerItem.objects.filter(is_active=True).order_by('order')[:10]
+    # Ticker items — import here to avoid circular imports
+    try:
+        from pages.models import TickerItem
+        ticker_items = TickerItem.objects.filter(is_active=True).order_by('order')
+    except Exception:
+        ticker_items = []
 
-    leaderboard_top = AdUnit.objects.filter(
-        position=AdUnit.Position.LEADERBOARD_TOP, is_active=True
-    ).first()
+    # Leaderboard ad
+    try:
+        leaderboard_top = AdUnit.objects.filter(
+            position=AdUnit.Position.LEADERBOARD_TOP, is_active=True
+        ).first()
+    except Exception:
+        leaderboard_top = None
 
     return {
         'nav_categories':  nav_categories,

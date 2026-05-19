@@ -1,13 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import View
 from django.contrib import messages
 from django.db.models import Q, F
 from django.http import JsonResponse, Http404
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 
 from .models import Article, Author, Comment, ArticleImage
 from categories.models import Category
@@ -19,7 +17,6 @@ from ads.models import AdUnit
 # ---------------------------------------------------------------------------
 
 def get_active_ads(position):
-    """Returns the first live AdUnit for a given position."""
     return AdUnit.objects.filter(position=position, is_active=True).first()
 
 
@@ -30,13 +27,6 @@ def get_sidebar_ads():
     }
 
 
-def get_breaking_articles(limit=5):
-    return Article.objects.filter(
-        status=Article.Status.PUBLISHED,
-        priority=Article.Priority.BREAKING
-    ).order_by('-published_at')[:limit]
-
-
 # ---------------------------------------------------------------------------
 # Home View
 # ---------------------------------------------------------------------------
@@ -45,39 +35,29 @@ class HomeView(View):
     template_name = 'home.html'
 
     def get(self, request):
-        published = Article.objects.filter(status=Article.Status.PUBLISHED).select_related(
-            'author', 'category'
-        )
+        published = Article.objects.filter(
+            status=Article.Status.PUBLISHED
+        ).select_related('author', 'category')
 
-        # Hero — editor's pick or most recent featured
         hero = published.filter(
-            priority__in=[Article.Priority.EDITOR, Article.Priority.FEATURED, Article.Priority.BREAKING]
+            priority__in=[
+                Article.Priority.EDITOR,
+                Article.Priority.FEATURED,
+                Article.Priority.BREAKING,
+            ]
         ).first() or published.first()
 
-        # Side stack — 4 most recent excluding hero
-        side_articles = published.exclude(pk=hero.pk if hero else 0)[:4]
+        exclude_pk = hero.pk if hero else 0
 
-        # Latest news — 6 most recent
-        latest = published.exclude(pk=hero.pk if hero else 0)[:6]
+        side_articles = published.exclude(pk=exclude_pk)[:4]
+        latest        = published.exclude(pk=exclude_pk)[:6]
+        editors_pick  = published.filter(priority=Article.Priority.EDITOR).first()
 
-        # Featured band — editor's pick for the dark feature band
-        editors_pick = published.filter(priority=Article.Priority.EDITOR).first()
+        sport_category    = Category.objects.filter(slug='sport', is_active=True).first()
+        sport_articles    = published.filter(category=sport_category)[:3] if sport_category else []
 
-        # Sport section
-        sport_category = Category.objects.filter(slug='sport').first()
-        sport_articles = published.filter(category=sport_category)[:3] if sport_category else []
-
-        # Politics section
-        politics_category = Category.objects.filter(slug='politics').first()
+        politics_category = Category.objects.filter(slug='politics', is_active=True).first()
         politics_articles = published.filter(category=politics_category)[:3] if politics_category else []
-
-        # Breaking ticker
-        from pages.models import TickerItem
-        ticker_items = TickerItem.objects.filter(is_active=True).order_by('order')
-
-        # Ads
-        leaderboard_top = get_active_ads(AdUnit.Position.LEADERBOARD_TOP)
-        between_cards   = get_active_ads(AdUnit.Position.BETWEEN_CARDS)
 
         context = {
             'hero':               hero,
@@ -86,10 +66,9 @@ class HomeView(View):
             'editors_pick':       editors_pick,
             'sport_articles':     sport_articles,
             'politics_articles':  politics_articles,
-            'ticker_items':       ticker_items,
-            'leaderboard_top':    leaderboard_top,
-            'between_cards':      between_cards,
-            'nav_categories':     Category.objects.filter(show_in_nav=True, is_active=True).order_by('nav_order'),
+            # Ads
+            'between_cards':      get_active_ads(AdUnit.Position.BETWEEN_CARDS),
+            # nav_categories, ticker_items, leaderboard_top come from context processor
         }
         return render(request, self.template_name, context)
 
@@ -108,30 +87,19 @@ class ArticleDetailView(View):
             status=Article.Status.PUBLISHED,
         )
 
-        # Increment view count (uses F() to avoid race conditions)
         article.increment_views()
 
-        # Related articles — same category, excluding current
         related = Article.objects.filter(
             status=Article.Status.PUBLISHED,
-            category=article.category
-        ).exclude(pk=article.pk).order_by('-published_at')[:4]
+            category=article.category,
+        ).exclude(pk=article.pk).select_related('author', 'category').order_by('-published_at')[:4]
 
-        # Comments — approved top-level only (replies fetched per comment)
-        comments = article.comments.filter(is_approved=True, parent=None).order_by('created_at')
+        comments = article.comments.filter(
+            is_approved=True, parent=None
+        ).order_by('created_at')
 
-        # Gallery images
-        gallery = article.gallery_images.all()
-
-        # Tags
-        tags = article.tags.all()
-
-        # Ads
-        in_article_1 = get_active_ads(AdUnit.Position.IN_ARTICLE_1)
-        in_article_2 = get_active_ads(AdUnit.Position.IN_ARTICLE_2)
-        sidebar_ads  = get_sidebar_ads()
-
-        # Sponsorship disclosure
+        gallery     = article.gallery_images.all()
+        tags        = article.tags.all()
         sponsorship = getattr(article, 'sponsorship', None)
 
         context = {
@@ -141,16 +109,16 @@ class ArticleDetailView(View):
             'comment_count': article.comments.filter(is_approved=True).count(),
             'gallery':       gallery,
             'tags':          tags,
-            'in_article_1':  in_article_1,
-            'in_article_2':  in_article_2,
+            'in_article_1':  get_active_ads(AdUnit.Position.IN_ARTICLE_1),
+            'in_article_2':  get_active_ads(AdUnit.Position.IN_ARTICLE_2),
             'sponsorship':   sponsorship,
-            **sidebar_ads,
+            **get_sidebar_ads(),
         }
         return render(request, self.template_name, context)
 
 
 # ---------------------------------------------------------------------------
-# Comment Submit View
+# Comment Submit
 # ---------------------------------------------------------------------------
 
 @require_POST
@@ -161,9 +129,9 @@ def submit_comment(request, slug):
         messages.error(request, "Comments are closed for this article.")
         return redirect(article.get_absolute_url())
 
-    name    = request.POST.get('name', '').strip()
-    email   = request.POST.get('email', '').strip()
-    body    = request.POST.get('body', '').strip()
+    name      = request.POST.get('name', '').strip()
+    email     = request.POST.get('email', '').strip()
+    body      = request.POST.get('body', '').strip()
     parent_id = request.POST.get('parent_id')
 
     if not all([name, email, body]):
@@ -183,7 +151,7 @@ def submit_comment(request, slug):
         name=name,
         email=email,
         body=body,
-        is_approved=False,   # requires moderation
+        is_approved=False,
     )
 
     messages.success(request, "Your comment has been submitted and is awaiting moderation.")
@@ -191,7 +159,7 @@ def submit_comment(request, slug):
 
 
 # ---------------------------------------------------------------------------
-# Category View
+# Category View  — FIXED
 # ---------------------------------------------------------------------------
 
 class CategoryView(View):
@@ -201,27 +169,35 @@ class CategoryView(View):
     def get(self, request, slug):
         category = get_object_or_404(Category, slug=slug, is_active=True)
 
-        # Include sub-category articles
-        category_ids = [category.pk] + list(category.children.values_list('pk', flat=True))
+        # Build category id list — include children only if the FK exists
+        category_ids = [category.pk]
+        if hasattr(category, 'children'):
+            category_ids += list(
+                category.children.filter(is_active=True).values_list('pk', flat=True)
+            )
 
         articles = Article.objects.filter(
             status=Article.Status.PUBLISHED,
             category__in=category_ids,
         ).select_related('author', 'category').order_by('-published_at')
 
+        # Debug helper — remove in production
+        # print(f"[CategoryView] slug={slug} ids={category_ids} count={articles.count()}")
+
         paginator = Paginator(articles, self.paginate_by)
         page_obj  = paginator.get_page(request.GET.get('page'))
 
-        # Featured article for the category hero
         featured = articles.filter(
             priority__in=[Article.Priority.FEATURED, Article.Priority.EDITOR]
         ).first() or articles.first()
+
+        sub_cats = category.children.filter(is_active=True) if hasattr(category, 'children') else []
 
         context = {
             'category':    category,
             'page_obj':    page_obj,
             'featured':    featured,
-            'sub_cats':    category.children.filter(is_active=True),
+            'sub_cats':    sub_cats,
             'leaderboard': get_active_ads(AdUnit.Position.LEADERBOARD_TOP),
         }
         return render(request, self.template_name, context)
@@ -236,11 +212,9 @@ class AuthorDetailView(View):
     paginate_by   = 10
 
     def get(self, request, slug):
-        author = get_object_or_404(Author, slug=slug, is_active=True)
-
+        author   = get_object_or_404(Author, slug=slug, is_active=True)
         articles = Article.objects.filter(
-            author=author,
-            status=Article.Status.PUBLISHED,
+            author=author, status=Article.Status.PUBLISHED
         ).select_related('category').order_by('-published_at')
 
         paginator = Paginator(articles, self.paginate_by)
@@ -271,9 +245,9 @@ class SearchView(View):
             results = Article.objects.filter(
                 status=Article.Status.PUBLISHED,
             ).filter(
-                Q(title__icontains=query) |
-                Q(excerpt__icontains=query) |
-                Q(body__icontains=query) |
+                Q(title__icontains=query)    |
+                Q(excerpt__icontains=query)  |
+                Q(body__icontains=query)     |
                 Q(tags__name__icontains=query) |
                 Q(author__full_name__icontains=query) |
                 Q(category__name__icontains=query)
@@ -292,7 +266,7 @@ class SearchView(View):
 
 
 # ---------------------------------------------------------------------------
-# Tag View  — articles by tag
+# Tag View
 # ---------------------------------------------------------------------------
 
 class TagView(View):
@@ -320,7 +294,7 @@ class TagView(View):
 
 
 # ---------------------------------------------------------------------------
-# Ad Click Tracker  — AJAX endpoint called by a tiny JS snippet on ad clicks
+# Ad Click Tracker
 # ---------------------------------------------------------------------------
 
 @require_POST
@@ -331,27 +305,26 @@ def track_ad_click(request, ad_id):
 
 
 # ---------------------------------------------------------------------------
-# Latest Articles API  — used by the JS ticker / infinite scroll
+# Latest Articles API
 # ---------------------------------------------------------------------------
 
 def latest_articles_api(request):
-    """Returns the 10 most recent published articles as JSON."""
     articles = Article.objects.filter(
         status=Article.Status.PUBLISHED
     ).select_related('author', 'category').order_by('-published_at')[:10]
 
     data = [
         {
-            'title':      a.title,
-            'slug':       a.slug,
-            'excerpt':    a.excerpt,
-            'category':   a.category.name if a.category else '',
-            'author':     a.author.full_name if a.author else '',
-            'published':  a.published_at.isoformat() if a.published_at else '',
-            'url':        a.get_absolute_url(),
-            'image':      a.hero_image.url if a.hero_image else '',
+            'title':        a.title,
+            'slug':         a.slug,
+            'excerpt':      a.excerpt,
+            'category':     a.category.name if a.category else '',
+            'author':       a.author.full_name if a.author else '',
+            'published':    a.published_at.isoformat() if a.published_at else '',
+            'url':          a.get_absolute_url(),
+            'image':        a.hero_image.url if a.hero_image else '',
             'reading_time': a.reading_time,
-            'priority':   a.priority,
+            'priority':     a.priority,
         }
         for a in articles
     ]
